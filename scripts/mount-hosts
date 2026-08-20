@@ -1,0 +1,79 @@
+#!/usr/bin/env bash
+set -u
+
+repo_dir=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")/.." && pwd)
+
+mount_host() {
+  local host=$1
+  local remote_path=$2
+  local follow_symlinks=${3:-false}
+  local mountpoint="$repo_dir/hosts/$host"
+  local log_file pid attempt error
+  local -a sshfs_options=(
+    -o BatchMode=yes
+    -o ConnectTimeout=8
+    -o ServerAliveInterval=15
+    -o ServerAliveCountMax=2
+  )
+
+  if [[ "$follow_symlinks" == true ]]; then
+    sshfs_options+=(-o follow_symlinks)
+  fi
+
+  if ! stat -- "$mountpoint" >/dev/null 2>&1; then
+    if fusermount3 -uz -- "$mountpoint" 2>/dev/null; then
+      printf '%s: detached stale mount\n' "$host"
+    fi
+  fi
+
+  mkdir -p -- "$mountpoint"
+
+  if mountpoint -q -- "$mountpoint"; then
+    printf '%s: already mounted\n' "$host"
+    return 0
+  fi
+
+  if ! ssh -o BatchMode=yes -o ConnectTimeout=8 "$host" true >/dev/null 2>&1; then
+    printf '%s: FAILED (SSH key unavailable; load it with ssh-add)\n' "$host" >&2
+    return 1
+  fi
+
+  log_file=$(mktemp "${TMPDIR:-/tmp}/mount-hosts-${host}.XXXXXX") || {
+    printf '%s: FAILED to create startup log\n' "$host" >&2
+    return 1
+  }
+
+  # Running SSHFS explicitly in the foreground avoids a daemonization failure
+  # seen in interactive WSL shells. nohup keeps that foreground process alive
+  # after this helper exits.
+  nohup sshfs -f "$host:$remote_path" "$mountpoint" \
+      "${sshfs_options[@]}" >"$log_file" 2>&1 &
+  pid=$!
+
+  for attempt in {1..100}; do
+    if mountpoint -q -- "$mountpoint"; then
+      rm -f -- "$log_file"
+      printf '%s: mounted\n' "$host"
+      return 0
+    fi
+    kill -0 "$pid" 2>/dev/null || break
+    sleep 0.1
+  done
+
+  if kill -0 "$pid" 2>/dev/null; then
+    kill "$pid" 2>/dev/null || true
+    wait "$pid" 2>/dev/null || true
+  fi
+  error=$(tail -n 1 -- "$log_file" 2>/dev/null)
+  rm -f -- "$log_file"
+  if [[ -n "$error" ]]; then
+    printf '%s: FAILED to mount (%s)\n' "$host" "$error" >&2
+  else
+    printf '%s: FAILED to mount\n' "$host" >&2
+  fi
+  return 1
+}
+
+mount_host mac /Users/jack/Server/services true || true
+mount_host spectre /home/jack/Server true || true
+mount_host surface /home/jack/Server true || true

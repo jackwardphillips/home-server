@@ -1,0 +1,30 @@
+#!/usr/bin/env bash
+set -u
+
+hosts=(mac spectre surface)
+
+for host in "${hosts[@]}"; do
+  printf '\n===== %s: Docker status =====\n' "$host"
+  if ! ssh -o BatchMode=yes -o ConnectTimeout=8 "$host" 'bash -s' <<'REMOTE'
+set +e
+docker_bin=$(command -v docker 2>/dev/null)
+if [ -z "$docker_bin" ]; then
+  for candidate in /usr/local/bin/docker /opt/homebrew/bin/docker /Applications/Docker.app/Contents/Resources/bin/docker; do
+    [ -x "$candidate" ] && docker_bin="$candidate" && break
+  done
+fi
+if [ -z "$docker_bin" ]; then
+  echo 'Docker CLI: unavailable'; exit 0
+fi
+echo "Docker CLI: $docker_bin"
+if ! "$docker_bin" version --format 'client={{.Client.Version}} server={{.Server.Version}}' 2>&1; then
+  echo 'Docker daemon: unavailable or inaccessible'; exit 0
+fi
+"$docker_bin" compose version 2>&1 || docker-compose version 2>&1 || echo 'Compose: unavailable'
+echo 'running containers:'
+"$docker_bin" ps --format 'table {{.Names}}\t{{.Image}}\t{{.Status}}\t{{.Ports}}' 2>&1
+REMOTE
+  then
+    printf 'ERROR: unable to query %s; continuing.\n' "$host" >&2
+  fi
+done

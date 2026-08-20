@@ -1,0 +1,3 @@
+# Live SSHFS views of remote hosts; never track remote files here.
+/hosts/
+/inventory.local.yaml

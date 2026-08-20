@@ -1,0 +1,26 @@
+#!/usr/bin/env bash
+set -u
+
+repo_dir=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")/.." && pwd)
+
+unmount_host() {
+  local host=$1
+  local mountpoint="$repo_dir/hosts/$host"
+
+  if ! mountpoint -q -- "$mountpoint" && stat -- "$mountpoint" >/dev/null 2>&1; then
+    printf '%s: already unmounted\n' "$host"
+    return 0
+  fi
+
+  if fusermount3 -u -- "$mountpoint" 2>/dev/null ||
+      fusermount3 -uz -- "$mountpoint"; then
+    printf '%s: unmounted\n' "$host"
+  else
+    printf '%s: FAILED to unmount\n' "$host" >&2
+    return 1
+  fi
+}
+
+unmount_host mac || true
+unmount_host spectre || true
+unmount_host surface || true

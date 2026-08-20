@@ -1,0 +1,9 @@
+[submodule "repos/hs-mac"]
+	path = repos/hs-mac
+	url = https://github.com/jackwardphillips/hs-mac.git
+[submodule "repos/hs-surface"]
+	path = repos/hs-surface
+	url = https://github.com/jackwardphillips/hs-surface.git
+[submodule "repos/hs-spectre"]
+	path = repos/hs-spectre
+	url = https://github.com/jackwardphillips/hs-spectre.git

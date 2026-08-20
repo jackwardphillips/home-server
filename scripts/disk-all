@@ -1,0 +1,21 @@
+#!/usr/bin/env bash
+set -u
+
+hosts=(mac spectre surface)
+
+for host in "${hosts[@]}"; do
+  printf '\n===== %s: disk status =====\n' "$host"
+  if ! ssh -o BatchMode=yes -o ConnectTimeout=8 "$host" 'bash -s' <<'REMOTE'
+set +e
+echo 'mounted filesystems:'
+df -hT -x tmpfs -x devtmpfs 2>/dev/null || df -h
+if command -v lsblk >/dev/null 2>&1; then
+  echo 'block devices:'; lsblk -o NAME,SIZE,FSTYPE,TYPE,MOUNTPOINTS,MODEL
+elif command -v diskutil >/dev/null 2>&1; then
+  echo 'physical disks:'; diskutil list physical 2>/dev/null || diskutil list
+fi
+REMOTE
+  then
+    printf 'ERROR: unable to query %s; continuing.\n' "$host" >&2
+  fi
+done

@@ -1,0 +1,154 @@
+inventory_version: 1
+observed_at: "2026-08-20"
+control_host:
+  name: waxwing
+  path: /home/jack/server
+  purpose: WSL control room
+
+hosts:
+  - alias: mac
+    hostname: jack-server
+    current_role: Application and data host with retained migration rollback copies
+    os: macOS 26.6 (build 25G72)
+    kernel: Darwin 25.6.0
+    architecture: arm64
+    cpu:
+      model: Apple M3
+      physical_cores: 8
+      logical_threads: 8
+    ram: 8 GiB
+    storage:
+      - device: /dev/disk0 (500.3 GB physical; APFS container /dev/disk3)
+        mounts: "/ and /System/Volumes/Data"
+        capacity: 460 GiB
+        available: 361 GiB
+    network:
+      lan_address: mac-lan.example
+      lan_interface: en0
+      tailscale_address: mac-tailnet.example
+    uptime_at_inspection: "2 days, 19 hours"
+    docker:
+      status: running via Docker Desktop
+      version: "29.6.2"
+      compose_version: "v5.3.1"
+      cli_note: /usr/local/bin/docker is absent from the non-interactive SSH PATH
+      running_projects:
+        - immich
+        - homepage
+        - beszel
+        - portainer
+        - backend (Twitcher one-shot poller)
+      stopped_containers:
+        - "minecraft (rollback copy after migration to surface on 2026-08-20)"
+        - "bluemap (rollback copy after migration to surface on 2026-08-20)"
+        - "the-observatory-postgres-test-1 (development database; exit 255, 2 days before inspection)"
+        - "the-observatory-postgres-1 (production rollback copy after migration to surface on 2026-08-20)"
+        - "Dawarich stack (four-container rollback copy after migration to surface on 2026-08-20)"
+    service_notes:
+      twitcher: Public application is hosted on Vercel; ingestion runs on this Mac
+      minecraft: Stopped rollback copy; active scheduled service is on surface
+    native_services:
+      running:
+        - Jellyfin (launchd)
+        - Netdata (Homebrew service)
+        - Beszel agent (Homebrew service)
+      disabled_rollback_jobs:
+        - BlueMap render job
+        - Minecraft schedule job
+        - Minecraft Discord join watcher
+    important_paths:
+      control_repository: /Users/jack/Server
+      compose_stacks: /Users/jack/Server/compose
+      application_repositories: /Users/jack/Server/apps
+      services_index: /Users/jack/Server/services
+      runtime_data: /Users/jack/Server/data
+      media: /Users/jack/Server/media
+      photos: /Users/jack/Server/photos
+      minecraft: /Users/jack/Server/minecraft
+      operations_docs: /Users/jack/Server/docs
+      launchd_definitions: /Users/jack/Server/config/launchd
+
+  - alias: spectre
+    hostname: spectre
+    current_role: Monitoring host running Beszel agent and independent Surface watchdog
+    deployment_note: Initially stood up about 3 days before inspection and brought back online on 2026-08-20
+    os: Ubuntu 26.04 LTS (Resolute Raccoon)
+    kernel: 7.0.0-30-generic
+    architecture: x86_64
+    cpu:
+      model: Intel Core i7-8550U @ 1.80GHz
+      sockets: 1
+      physical_cores: 4
+      logical_threads: 8
+    ram: 6.8 GiB
+    storage:
+      - device: /dev/nvme0n1 (238.5 GiB)
+        root_volume: /dev/mapper/ubuntu--vg-ubuntu--lv
+        root_capacity: 98 GiB
+        root_available: 84 GiB
+        note: Intentional LVM installation; physical volume is larger than the allocated 100 GiB logical volume
+    network:
+      lan_address: spectre-lan.example
+      lan_interface: wlp2s0
+      tailscale_address: spectre-tailnet.example
+    uptime_at_inspection: 24 minutes
+    docker:
+      status: running (systemd-enabled)
+      version: "29.7.2"
+      compose_version: "v5.5.0"
+      running_containers: [beszel-agent, surface-watchdog, power-monitor]
+    relevant_systemd_services: [docker, containerd, tailscaled]
+    important_paths:
+      services: /home/jack/services
+      beszel_agent_compose: /home/jack/services/beszel-agent/compose.yaml
+      surface_watchdog_compose: /home/jack/services/surface-watchdog/compose.yaml
+      power_monitor_compose: /home/jack/services/power-monitor/compose.yaml
+
+  - alias: surface
+    hostname: surface
+    current_role: Availability, Observatory, Dawarich, and game-service host
+    deployment_note: First brought online on 2026-08-20
+    os: Ubuntu 26.04 LTS (Resolute Raccoon)
+    kernel: 7.0.0-30-generic
+    architecture: x86_64
+    cpu:
+      model: Intel Core i7-8650U @ 1.90GHz
+      sockets: 1
+      physical_cores: 4
+      logical_threads: 8
+    ram: 15 GiB
+    storage:
+      - device: /dev/nvme0n1 (953.9 GiB)
+        root_volume: /dev/mapper/ubuntu--vg-ubuntu--lv
+        root_capacity: 787 GiB
+        root_available: 737 GiB
+        note: Intentional LVM installation; physical volume is larger than the allocated 800 GiB logical volume
+    network:
+      lan_address: surface-lan.example
+      lan_interface: wlp1s0
+      tailscale_address: surface-tailnet.example
+    uptime_at_inspection: "3 hours, 59 minutes"
+    docker:
+      status: running (systemd-enabled)
+      version: "29.7.2"
+      compose_version: "v5.5.0"
+      running_containers: [beszel-agent, uptime-kuma, power-monitor, the-observatory-api-1, the-observatory-scheduler-1, the-observatory-postgres-1, dawarich_app, dawarich_sidekiq, dawarich_db, dawarich_redis, minecraft, bluemap, minecraft-dashboard]
+    relevant_systemd_services: [docker, containerd, tailscaled, minecraft-join-watcher]
+    relevant_systemd_timers: [minecraft-reconcile, bluemap-render]
+    important_paths:
+      services: /home/jack/services
+      beszel_agent_compose: /home/jack/services/beszel-agent/compose.yaml
+      uptime_kuma_compose: /home/jack/services/uptime-kuma/compose.yaml
+      uptime_kuma_url: http://surface-tailnet.example:3001
+      power_monitor_compose: /home/jack/services/power-monitor/compose.yaml
+      observatory: /home/jack/services/the-observatory
+      observatory_url: http://surface-tailnet.example:8000
+      dawarich: /home/jack/services/dawarich
+      dawarich_url: https://surface.example
+      minecraft: /home/jack/services/minecraft
+      minecraft_data: /home/jack/minecraft
+      minecraft_dashboard: /home/jack/services/minecraft-dashboard
+      minecraft_dashboard_url: http://surface-tailnet.example:3003/minecraft/
+      bluemap: /home/jack/services/bluemap
+      bluemap_data: /home/jack/bluemap
+      bluemap_url: http://surface-tailnet.example:8100

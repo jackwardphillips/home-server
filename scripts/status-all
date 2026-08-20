@@ -1,0 +1,28 @@
+#!/usr/bin/env bash
+set -u
+
+hosts=(mac spectre surface)
+
+for host in "${hosts[@]}"; do
+  printf '\n===== %s: system status =====\n' "$host"
+  if ! ssh -o BatchMode=yes -o ConnectTimeout=8 "$host" 'bash -s' <<'REMOTE'
+set +e
+printf 'hostname: '; hostname
+printf 'uptime/load: '; uptime
+if command -v free >/dev/null 2>&1; then
+  echo 'memory:'; free -h
+else
+  bytes=$(sysctl -n hw.memsize 2>/dev/null)
+  [ -n "$bytes" ] && awk -v bytes="$bytes" 'BEGIN { printf "memory total: %.1f GiB\n", bytes / 1073741824 }'
+  vm_stat 2>/dev/null | head -6
+fi
+echo 'root filesystem:'; df -h / 2>/dev/null
+if command -v systemctl >/dev/null 2>&1; then
+  printf 'failed systemd units: '
+  systemctl --failed --no-legend 2>/dev/null | wc -l
+fi
+REMOTE
+  then
+    printf 'ERROR: unable to query %s; continuing.\n' "$host" >&2
+  fi
+done
