@@ -1,5 +1,83 @@
 # Changelog
 
+## 2026-08-23
+
+### Fleet management
+
+- Split Waxwing SSH access into passphrase-protected interactive aliases
+  (`mac`, `spectre`, and `surface`) with PTY support and restricted unattended
+  aliases (`mac-codex`, `spectre-codex`, and `surface-codex`). Updated the
+  read-only fleet scripts and control-room guidance to use the unattended
+  aliases without weakening their server-side restrictions.
+- Added enabled weekly reboot timers on Spectre and Surface, staggered after
+  the Mac's Saturday 3:00 AM maintenance window. Spectre reboots at 3:15 AM and
+  Surface at 3:30 AM in `America/New_York`; missed timers do not trigger a late
+  reboot on the next startup.
+
+### Services
+
+- `surface`: Evaluated and then retired a tailnet-only local personal-assistant
+  prototype using Ollama and Qwen 3 4B. The model handled simple prompts and
+  narrow tools but was too slow and inconsistent for the desired cross-metric
+  reasoning on the available CPU/6 GiB GPU-class hardware. Removed the assistant
+  containers, downloaded model volume, images, and service tree after preserving
+  the findings in `docs/personal-assistant-feasibility.md`; Observatory, Beszel,
+  and all unrelated services and data were left unchanged.
+
+## 2026-08-22
+
+### Storage and media
+
+- `mac`: Temporarily stopped Immich and cleanly unmounted the external `Media`
+  SSD for a media-import workflow. Copied 47 distinct movies (95 GB) from the
+  read-only `Lab-backup2` source through internal Mac staging into
+  `/Volumes/Media/archive/Lab-backup2-20260822/movies`, then added clean
+  per-title symlink entries under `/Volumes/Media/libraries/movies`. The source
+  SSD and internal staging copy were retained. Reconnected `Media`, restarted
+  Docker Desktop, and verified Immich and the other Mac containers healthy.
+
+## 2026-08-21
+
+### Storage and media
+
+- Reformatted the Mac-attached 2 TB Seagate external SSD as GPT/APFS with the
+  volume name `Media`, after the user confirmed the personal media had been
+  backed up. Restored the selected entertainment archive from checksum-verified
+  Surface staging and started a final source-to-destination checksum pass; the
+  Surface copy remains in place pending explicit approval to remove it.
+- Added a non-destructive Jellyfin movie view at
+  `/Volumes/Media/libraries/movies`. It presents 17 consistently named movies
+  through symlinks to the preserved files under `/Volumes/Media/archive`,
+  omitting duplicate and bonus-title files without modifying the archive.
+
+### Fleet management
+
+- Changed Surface and Spectre from `Etc/UTC` to the
+  `America/New_York` system timezone so host clocks, logs, and calendar timers
+  consistently follow Eastern time, including daylight-saving transitions.
+  Removed Surface's now-redundant Minecraft scheduler timezone override; its
+  weekday 5:00 PM, weekend 7:30 AM, midnight shutdown, and 12:10 AM BlueMap
+  boundaries are now interpreted directly in the host timezone.
+- Added a dedicated unattended SSH identity on Waxwing for control-room access
+  to `mac`, `spectre`, and `surface`. Each host authorization is restricted to
+  its observed Waxwing source address and disables SSH agent, port, and X11
+  forwarding plus PTY allocation. Existing user SSH keys were preserved.
+
+### Services
+
+- `mac`: Migrated the Immich photo library from the internal
+  `/Users/jack/Server/photos` path to the external APFS `Media` volume at
+  `/Volumes/Media/libraries/immich`. PostgreSQL remains on the internal SSD.
+  Added a Compose bind-mount guard so Immich will not create a fallback library
+  directory when the external volume is unavailable. Retained the original
+  internal photo directory as a rollback copy.
+- Added NASA DONKI event ingestion and a bandwidth-bounded NOAA GOES-19 GLM
+  lightning sampler to Personal Observatory on Surface. DONKI polls hourly;
+  GLM samples one 20-second frame every 15 minutes, retains flashes within
+  100 km, rejects source objects above 2 MB, and does not retain NetCDF files.
+  Applied additive database migration 0010 and rebuilt the API and scheduler;
+  PostgreSQL and its persistent volume remained online and untouched.
+
 ## 2026-08-20
 
 ### Fleet management
