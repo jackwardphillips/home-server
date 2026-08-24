@@ -16,6 +16,14 @@
 
 ### Services
 
+- `surface`: Added an on-demand, private-network Photon 1.2.1 reverse-geocoding
+  service for Dawarich using the checksum-verified USA OpenStreetMap database.
+  Photon is capped at 3 GiB, normally stopped, and started daily at 1:10 AM by
+  a guarded catch-up runner that verifies readiness and progress before stopping
+  it. Recreated only the Dawarich app and Sidekiq containers to load the local
+  endpoint, then reverse-geocoded all 21,601 existing points without external
+  coordinate requests. Tuned city detection to a 40-minute minimum with a
+  30-minute maximum gap; nine cities currently satisfy that threshold.
 - `surface`: Evaluated and then retired a tailnet-only local personal-assistant
   prototype using Ollama and Qwen 3 4B. The model handled simple prompts and
   narrow tools but was too slow and inconsistent for the desired cross-metric
