@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -u
 
-hosts=(mac spectre surface)
+hosts=(mac-codex spectre-codex surface-codex)
 
 for host in "${hosts[@]}"; do
   printf '\n===== %s: disk status =====\n' "$host"

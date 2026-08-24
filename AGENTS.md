@@ -24,7 +24,10 @@ services. Prioritize reliability over speed.
 
 - `waxwing` is the WSL control machine. Application workloads generally run on
   remote hosts, not in this directory.
-- Use the configured SSH aliases `mac`, `spectre`, and `surface`.
+- The short SSH aliases `mac`, `spectre`, and `surface` use the owner's
+  passphrase-protected interactive key and permit PTYs. For unattended control-
+  room commands, use `mac-codex`, `spectre-codex`, and `surface-codex`; those
+  aliases use the restricted no-PTY automation key.
 - Consult the ignored `inventory.local.yaml` when present, otherwise use the
   public example in `inventory.yaml`; always verify roles and live state before
   acting.

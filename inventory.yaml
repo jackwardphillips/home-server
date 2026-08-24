@@ -7,6 +7,7 @@ control_host:
 
 hosts:
   - alias: mac
+    automation_alias: mac-codex
     hostname: jack-server
     current_role: Application and data host with retained migration rollback copies
     os: macOS 26.6 (build 25G72)
@@ -69,6 +70,7 @@ hosts:
       launchd_definitions: /Users/jack/Server/config/launchd
 
   - alias: spectre
+    automation_alias: spectre-codex
     hostname: spectre
     current_role: Monitoring host running Beszel agent and independent Surface watchdog
     deployment_note: Initially stood up about 3 days before inspection and brought back online on 2026-08-20
@@ -105,6 +107,7 @@ hosts:
       power_monitor_compose: /home/jack/services/power-monitor/compose.yaml
 
   - alias: surface
+    automation_alias: surface-codex
     hostname: surface
     current_role: Availability, Observatory, Dawarich, and game-service host
     deployment_note: First brought online on 2026-08-20

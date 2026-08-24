@@ -2,7 +2,9 @@
 
 This directory is the lightweight control room for a three-node home server. It
 runs on `waxwing` in WSL. Application workloads run on the remote hosts and are
-managed over the existing SSH aliases `mac`, `spectre`, and `surface`.
+managed over SSH. The short aliases `mac`, `spectre`, and `surface` are for
+interactive administration; unattended control-room commands use the matching
+`mac-codex`, `spectre-codex`, and `surface-codex` aliases.
 
 This document records observed reality as of 2026-08-20. See
 [`inventory.yaml`](inventory.yaml) for hardware, network, storage, and software
@@ -121,6 +123,16 @@ Connect from `waxwing` with:
 ssh mac
 ssh spectre
 ssh surface
+```
+
+Those short aliases use the owner's passphrase-protected key and permit an
+interactive terminal. Read-only scripts and other unattended commands use the
+restricted, no-PTY aliases instead:
+
+```bash
+ssh mac-codex command
+ssh spectre-codex command
+ssh surface-codex command
 ```
 
 Codex should begin multi-host work here, inspect the relevant host before making
