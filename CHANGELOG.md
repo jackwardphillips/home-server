@@ -1,5 +1,26 @@
 # Changelog
 
+## 2026-08-25
+
+### Monitoring
+
+- `mac`: Tuned the native Netdata service by disabling the unsupported
+  privileged `powermetrics` collector and excluding the `Seagate Backup Plus
+  Drive` and `Lab-backup2` mount paths from macOS disk/inode collection. This
+  removed two false critical inode alarms and recurring collector warnings;
+  the localhost-only listener and tailnet-only Tailscale Serve route remain
+  unchanged. A pre-change configuration backup is retained beside
+  `netdata.conf` as `netdata.conf.pre-fleet-20260825`. Removed the existing
+  Netdata Cloud claim credentials and restarted the agent; it now reports
+  unclaimed and offline while its local API, history, and alarms remain healthy.
+- `spectre` and `surface`: Installed Netdata 2.11.0 as enabled native systemd
+  services for on-demand diagnostics through the control-room SSH connection.
+  Each API is bound only to `127.0.0.1:19999`; cross-host streaming and new
+  Tailscale Serve routes are disabled. Each host retains up to seven days of
+  local history in a single dbengine tier capped at 256 MiB. Existing Docker,
+  Tailscale, watchdog, game, database, and application services were not
+  restarted or reconfigured.
+
 ## 2026-08-23
 
 ### Fleet management

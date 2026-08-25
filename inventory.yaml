@@ -99,7 +99,7 @@ hosts:
       version: "29.7.2"
       compose_version: "v5.5.0"
       running_containers: [beszel-agent, surface-watchdog, power-monitor]
-    relevant_systemd_services: [docker, containerd, tailscaled]
+    relevant_systemd_services: [docker, containerd, tailscaled, netdata]
     important_paths:
       services: /home/jack/services
       beszel_agent_compose: /home/jack/services/beszel-agent/compose.yaml
@@ -136,7 +136,7 @@ hosts:
       version: "29.7.2"
       compose_version: "v5.5.0"
       running_containers: [beszel-agent, uptime-kuma, power-monitor, the-observatory-api-1, the-observatory-scheduler-1, the-observatory-postgres-1, dawarich_app, dawarich_sidekiq, dawarich_db, dawarich_redis, minecraft, bluemap, minecraft-dashboard]
-    relevant_systemd_services: [docker, containerd, tailscaled, minecraft-join-watcher]
+    relevant_systemd_services: [docker, containerd, tailscaled, netdata, minecraft-join-watcher]
     relevant_systemd_timers: [minecraft-reconcile, bluemap-render]
     important_paths:
       services: /home/jack/services
