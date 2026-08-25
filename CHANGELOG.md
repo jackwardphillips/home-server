@@ -29,6 +29,20 @@
   Tailscale, watchdog, game, database, and application services were not
   restarted or reconfigured.
 
+### Services
+
+- `surface`: Reduced Dawarich visit noise by preserving and naming reviewed
+  Home, Work, Gateway Shopping Center, Hugelmeyers', and Jack's Barber Shop
+  visits; declining a verified driving artifact; and changing detection from a
+  200-metre/3-point/5-minute threshold to 100 metres, five points, and 15
+  minutes. Added a read-only application override that prevents the midnight
+  place job from processing overlapping unconfirmed Photon candidates, which
+  had duplicated visits created by realtime detection. Recreated only the
+  Dawarich app and Sidekiq containers, then completed full-history re-detection
+  and review; suggestions fell from 36 to zero. PostgreSQL and Redis stayed
+  running, and a validated pre-change dump is retained at
+  `/home/jack/backups/dawarich/20260825-before-visit-cleanup.sql.gz`.
+
 ## 2026-08-23
 
 ### Fleet management
