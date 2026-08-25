@@ -4,6 +4,14 @@
 
 ### Monitoring
 
+- `surface`: Corrected Personal Observatory NWS hourly-precipitation normalization from
+  source millimetres to stored metres and transactionally repaired affected historical rows.
+  Eliminated unconditional USGS earthquake rewrites so unchanged feed records no longer
+  generate database updates. Disabled the deliberately incomplete GOES GLM frame sampler,
+  changed Robots4Whales polling from 30 to 60 minutes, rebuilt/recreated only the Observatory
+  API and scheduler, and verified schema `0011`, API/database health, collector registration,
+  and a live USGS run with zero spurious updates. PostgreSQL and its persistent volume were
+  preserved.
 - `mac`: Tuned the native Netdata service by disabling the unsupported
   privileged `powermetrics` collector and excluding the `Seagate Backup Plus
   Drive` and `Lab-backup2` mount paths from macOS disk/inode collection. This
